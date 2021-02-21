@@ -4,20 +4,20 @@ import java.awt.image.BufferedImage;
 
 public class Window extends JFrame { //TODO:
     BufferedImage bufferedImage;
+    private int width;
+    private int height;
+    private int xCenter;
+    private int yCenter;
 
-    public Window(BufferedImage bufferedImage) {
+
+    public Window() {
         JFrame frame = new JFrame();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         //setExtendedState(MAXIMIZED_BOTH);
 
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
-        int xCenter = (int) (dimension.getWidth() / 2) - (WIDTH / 2);
-        int yCenter = (int) (dimension.getHeight() / 2) - (HEIGHT / 2);
+
         setBounds(xCenter, yCenter, width, height);
 
-        this.bufferedImage = bufferedImage;
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -33,5 +33,44 @@ public class Window extends JFrame { //TODO:
     public void drawPicture(BufferedImage bufferedImage) {
         this.bufferedImage = bufferedImage;
         repaint();
+    }
+
+    public void drawPicture(Picture picture) {
+        loadPicture(picture);
+        repaint();
+    }
+
+    public void drawImage(Picture picture) {
+        loadImage(picture);
+        repaint();
+    }
+
+    private void loadPicture(Picture picture) {
+        bufferedImage = picture.getPicture();
+        width = bufferedImage.getWidth();
+        height = bufferedImage.getHeight();
+        setWindowBounds();
+    }
+
+    private void loadImage(Picture picture) {
+        bufferedImage = picture.getImage();
+        setWindowBounds();
+    }
+
+    private void setWindowBounds() {
+        setWindowSize();
+        setWindowPos();
+        setBounds(xCenter, yCenter, width, height);
+    }
+
+    private void setWindowPos() {
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        xCenter = (int) (dimension.getWidth() / 2) - (width / 2);
+        yCenter = (int) (dimension.getHeight() / 2) - (height / 2);
+    }
+
+    private void setWindowSize() {
+        width = bufferedImage.getWidth();
+        height = bufferedImage.getHeight();
     }
 }

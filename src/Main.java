@@ -8,15 +8,15 @@ public class Main {
         int width = 1920;
         int height = 1080;
         int colorNumber = 1023;
-        String fileName = "number.txt";
 
+        File file = new File("DickRGB.txt");
 
-        String number = getNumberFromFile(fileName);
-
-        Picture picture = new Picture(width, height, colorNumber, number);
-        Window window = new Window(picture.getPicture());
-
-        test(window, picture, number);
+        Picture picture = new Picture();
+        picture.readPictureFromImage("Dick.png");
+        picture.savePictureToFile("DickRGB.txt");
+        picture.loadPictureFromFile(file);
+        Window window = new Window();
+        window.drawPicture(picture);
     }
 
     static String getNumberFromFile(String fileName) {
@@ -40,19 +40,19 @@ public class Main {
         return number;
     }
 
-    static void test(Window window, Picture picture, String number) {
-        BigInteger bigNumber = new BigInteger(number);
-        bigNumber = bigIntegerExponentiation(bigNumber, 18);
-        for (int i = 0; i < 1000; i++) {
-            picture.reDraw(bigNumber);
-            window.drawPicture(picture.getPicture());
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            String multiplier = String.valueOf((int)Math.exp((double) i));
-            bigNumber = bigNumber.multiply(new BigInteger(multiplier));
-        }
-    }
+//    static void test(Window window, Picture picture, String number) {
+//        BigInteger bigNumber = new BigInteger(number);
+//        bigNumber = bigIntegerExponentiation(bigNumber, 18);
+//        for (int i = 0; i < 1000; i++) {
+//            picture.reDraw(bigNumber);
+//            window.drawPicture(picture.getPicture());
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            String multiplier = String.valueOf((int)Math.exp((double) i));
+//            bigNumber = bigNumber.multiply(new BigInteger(multiplier));
+//        }
+//    }
 }
