@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Window extends JFrame { //TODO:
+public class Window extends JFrame {
     BufferedImage bufferedImage;
     private int width;
     private int height;
@@ -14,9 +14,6 @@ public class Window extends JFrame { //TODO:
         JFrame frame = new JFrame();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         //setExtendedState(MAXIMIZED_BOTH);
-
-
-        setBounds(xCenter, yCenter, width, height);
 
         JPanel panel = new JPanel() {
             @Override

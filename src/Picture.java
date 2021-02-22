@@ -59,7 +59,9 @@ public class Picture {
                 sb.append(decToBool(getColorFromImage(x, y)));
             }
         }
+        long timer = System.currentTimeMillis();
         rgbNumber = new BigInteger(sb.toString(), 2);
+        System.out.println("sb.toString: " + (System.currentTimeMillis() - timer));
         pictureWidth = imageWidth;
         pictureHeight = imageHeight;
     }
@@ -92,10 +94,10 @@ public class Picture {
     }
 
     private void loadPictureFromRGBNumber() {
-        picture = new BufferedImage(pictureWidth, pictureHeight, BufferedImage.TYPE_INT_ARGB);
+        picture = new BufferedImage(pictureWidth, pictureHeight, BufferedImage.TYPE_INT_RGB);
         int pixelNum = 1;
-        for (int x = 0; x < pictureWidth; x++) {
-            for (int y = 0; y < pictureHeight; y++) {
+        for (int x = pictureWidth - 1; x >= 0; x--) {
+            for (int y = pictureHeight - 1; y >= 0; y--) {
                 picture.setRGB(x, y, getColorFromRGBNumber(pixelNum));
                 pixelNum++;
             }
@@ -165,7 +167,7 @@ public class Picture {
         for (int i = 31; i >= 0; i--) {
             int numBit = (pixelNum - 1) * 32 + i;
             int bit = rgbNumber.testBit(numBit) ? 1 : 0;
-            argb |= i << bit;
+            argb |= bit << i;
         }
         return argb;
     }
