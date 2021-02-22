@@ -9,22 +9,10 @@ public class Main {
         int height = 1080;
         int colorNumber = 1023;
 
-        File file = new File("RadiationRGB.txt");
-
         Picture picture = new Picture();
-        long timerTotal = System.currentTimeMillis();
-        long timer = System.currentTimeMillis();
-        //picture.readPictureFromImage("Radiation.png");
-        System.out.println("readPictureFromImage: " + (System.currentTimeMillis() - timer));
+        picture.imageToFile("Loveis.png");
+        picture.loadPictureFromFile("Loveis");
 
-        timer = System.currentTimeMillis();
-        //picture.savePictureToFile("RadiationRGB.txt");
-        System.out.println("savePictureToFile: " + (System.currentTimeMillis() - timer));
-
-        timer = System.currentTimeMillis();
-        picture.loadPictureFromFile(file);
-        System.out.println("loadPictureFromFile: " + (System.currentTimeMillis() - timer));
-        System.out.println("Total: " + (System.currentTimeMillis() - timerTotal));
         Window window = new Window();
         window.drawPicture(picture);
     }
