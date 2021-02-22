@@ -14,11 +14,11 @@ public class Main {
         Picture picture = new Picture();
         long timerTotal = System.currentTimeMillis();
         long timer = System.currentTimeMillis();
-        picture.readPictureFromImage("Radiation.png");
+        //picture.readPictureFromImage("Radiation.png");
         System.out.println("readPictureFromImage: " + (System.currentTimeMillis() - timer));
 
         timer = System.currentTimeMillis();
-        picture.savePictureToFile("RadiationRGB.txt");
+        //picture.savePictureToFile("RadiationRGB.txt");
         System.out.println("savePictureToFile: " + (System.currentTimeMillis() - timer));
 
         timer = System.currentTimeMillis();

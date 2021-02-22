@@ -2,6 +2,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.reflect.ParameterizedType;
 import java.math.BigInteger;
 
 public class Picture {
@@ -9,26 +10,10 @@ public class Picture {
     private int imageHeight;
     private int pictureWidth;
     private int pictureHeight;
-    private BigInteger rgbNumber;
+    private String rgbNumber;
     private BigInteger indexNumber;
     private BufferedImage picture;
     private BufferedImage image;
-    private colors.Color color;
-    private int colorBitLength;
-    private int numberBitIndex;
-    private Window window;
-
-//    public Picture(int width, int height, int colorNumber, String number) {
-//        this.width = width;
-//        this.height = height;
-//        this.number = new BigInteger(number);
-//        colorBitLength = getBitLength(colorNumber);
-//        color = new colors.Color(colorNumber);
-//        bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-//    }
-
-    public Picture () {
-    }
 
     public BufferedImage getPicture() {
         return picture;
@@ -46,7 +31,7 @@ public class Picture {
                 sb.append(decToBool(getColorFromImage(x, y)));
             }
         }
-        rgbNumber = new BigInteger(sb.toString(), 2);
+        rgbNumber = sb.toString();
         pictureWidth = imageWidth;
         pictureHeight = imageHeight;
     }
@@ -54,14 +39,12 @@ public class Picture {
     public void readPictureFromImage(String path) {
         loadImage(path);
         StringBuilder sb = new StringBuilder();
-        for (int x = 0; x < imageWidth; x++) {
-            for (int y = 0; y < imageHeight; y++) {
+        for (int x = imageWidth - 1; x >= 0; x--) {
+            for (int y = imageHeight - 1; y >= 0; y--) {
                 sb.append(decToBool(getColorFromImage(x, y)));
             }
         }
-        long timer = System.currentTimeMillis();
-        rgbNumber = new BigInteger(sb.toString(), 2);
-        System.out.println("sb.toString: " + (System.currentTimeMillis() - timer));
+        rgbNumber = sb.toString();
         pictureWidth = imageWidth;
         pictureHeight = imageHeight;
     }
@@ -96,9 +79,14 @@ public class Picture {
     private void loadPictureFromRGBNumber() {
         picture = new BufferedImage(pictureWidth, pictureHeight, BufferedImage.TYPE_INT_RGB);
         int pixelNum = 1;
-        for (int x = pictureWidth - 1; x >= 0; x--) {
-            for (int y = pictureHeight - 1; y >= 0; y--) {
-                picture.setRGB(x, y, getColorFromRGBNumber(pixelNum));
+        for (int x = 0; x < pictureWidth; x++) {
+            for (int y = 0; y < pictureHeight; y++) {
+                try {
+                    picture.setRGB(x, y, getColorFromRGBNumber(pixelNum));
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    System.out.println("Файл короче изображения");
+                    picture.setRGB(x, y, 0);
+                }
                 pixelNum++;
             }
         }
@@ -115,7 +103,7 @@ public class Picture {
                 sb.append((char) symbol);
                 symbol = br.read();
             }
-            rgbNumber = new BigInteger(sb.toString(), 16);
+            rgbNumber = sb.toString();
         } catch (IOException e) {
             System.out.println("Не удалось прочитать файл " + file.getPath());
         }
@@ -164,10 +152,22 @@ public class Picture {
 
     private int getColorFromRGBNumber(int pixelNum) {
         int argb = 0;
-        for (int i = 31; i >= 0; i--) {
-            int numBit = (pixelNum - 1) * 32 + i;
-            int bit = rgbNumber.testBit(numBit) ? 1 : 0;
-            argb |= bit << i;
+        //StringBuilder hexNum = new StringBuilder();
+        String boolNum;
+        int bitNum = 31;
+        try {
+            for (int i = 0; i < 8; i++) {
+                //hexNum.append(hexToBool(rgbNumber.charAt((pixelNum - 1) * 8 + i)));
+                boolNum = hexToBool(rgbNumber.charAt((pixelNum - 1) * 8 + i));
+                for (int j = 0; j < 4; j++) {
+                    int bit = boolNum.charAt(j) == '1' ? 1 : 0;
+                    argb |= bit << bitNum;
+                    bitNum--;
+                }
+            }
+        } catch (StringIndexOutOfBoundsException e) {
+            System.out.println("Файл короче изображения");
+            return 0;
         }
         return argb;
     }
@@ -176,41 +176,148 @@ public class Picture {
         return Integer.toBinaryString(num);
     }
 
-    private String boolToHex(BigInteger num) {
-        return num.toString(16).toUpperCase();
+    private String boolToHex(String num) { //TODO: Сделать без использования BigInteger
+        StringBuilder boolNum = new StringBuilder();
+        StringBuilder hexNum = new StringBuilder();
+        int placeNum = 0;
+        for (int i = 0; i < num.length() / 4; i++) {
+            boolNum = new StringBuilder();
+            for (int j = 0; j < 4; j++) {
+                boolNum.append(num.charAt(placeNum));
+                placeNum++;
+            }
+            switch (boolNum.toString()) {
+                case "0000":
+                    hexNum.append("0");
+                    break;
+                case "0001":
+                    hexNum.append("1");
+                    break;
+                case "0010":
+                    hexNum.append("2");
+                    break;
+                case "0011":
+                    hexNum.append("3");
+                    break;
+                case "0100":
+                    hexNum.append("4");
+                    break;
+                case "0101":
+                    hexNum.append("5");
+                    break;
+                case "0110":
+                    hexNum.append("6");
+                    break;
+                case "0111":
+                    hexNum.append("7");
+                    break;
+                case "1000":
+                    hexNum.append("8");
+                    break;
+                case "1001":
+                    hexNum.append("9");
+                    break;
+                case "1010":
+                    hexNum.append("A");
+                    break;
+                case "1011":
+                    hexNum.append("B");
+                    break;
+                case "1100":
+                    hexNum.append("C");
+                    break;
+                case "1101":
+                    hexNum.append("D");
+                    break;
+                case "1110":
+                    hexNum.append("E");
+                    break;
+                case "1111":
+                    hexNum.append("F");
+                    break;
+            }
+        }
+        return hexNum.toString();
     }
 
-    private String boolToHex(String num) {
-        return new BigInteger(num, 2).toString(16).toUpperCase();
+    private String hexToBool(String num) {
+        StringBuilder bool = new StringBuilder();
+        for (int i = 0; i < num.length(); i++) {
+            switch(num.charAt(i)) {
+                case '0':
+                    bool.append("0000");
+                    break;
+                case '1':
+                    bool.append("0001");
+                    break;
+                case '2':
+                    bool.append("0010");
+                    break;
+                case '3':
+                    bool.append("0011");
+                    break;
+                case '4':
+                    bool.append("0100");
+                    break;
+                case '5':
+                    bool.append("0101");
+                    break;
+                case '6':
+                    bool.append("0110");
+                    break;
+                case '7':
+                    bool.append("0111");
+                    break;
+                case '8':
+                    bool.append("1000");
+                    break;
+                case '9':
+                    bool.append("1001");
+                    break;
+                case 'A':
+                    bool.append("1010");
+                    break;
+                case 'B':
+                    bool.append("1011");
+                    break;
+                case 'C':
+                    bool.append("1100");
+                    break;
+                case 'D':
+                    bool.append("1101");
+                    break;
+                case 'E':
+                    bool.append("1110");
+                    break;
+                case 'F':
+                    bool.append("1111");
+                    break;
+            }
+        }
+        return bool.toString();
     }
 
-//    public void reDraw(BigInteger number) {
-//        this.number = number;
-//        definePicture();
-//    }
-//
-//    public void reDraw(String number) {
-//        this.number = new BigInteger(number);
-//        definePicture();
-//    }
-//
-//    private void definePicture() {
-//        numberBitIndex = 0;
-//        for (int i = 0; i < width; i++) {
-//            for (int j = 0; j < height; j++) {
-//                bufferedImage.setRGB(i, j, color.getColor(getColorIndexOfNextPixel()));
-//            }
-//        }
-//    }
-//
-//    private int getColorIndexOfNextPixel() {
-//        String colorIndex = "";
-//        for (int i = numberBitIndex; i < (numberBitIndex + colorBitLength); i++) {
-//            colorIndex += getBit(number, i);
-//        }
-//        numberBitIndex += colorBitLength;
-//        return Integer.valueOf(colorIndex, 2);
-//    }
+    private String hexToBool(char num) {
+        switch(num) {
+                case '0': return "0000";
+                case '1': return "0001";
+                case '2': return "0010";
+                case '3': return "0011";
+                case '4': return "0100";
+                case '5': return "0101";
+                case '6': return "0110";
+                case '7': return "0111";
+                case '8': return "1000";
+                case '9': return "1001";
+                case 'A': return "1010";
+                case 'B': return "1011";
+                case 'C': return "1100";
+                case 'D': return "1101";
+                case 'E': return "1110";
+                case 'F': return "1111";
+                default: throw new RuntimeException("Failed convert hex to bool");
+            }
+    }
 
     private int getBit(BigInteger num, int index) {
         return num.testBit(index) ? 1 : 0;
