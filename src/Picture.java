@@ -4,6 +4,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLOutput;
 
 public class Picture {
     private int imageWidth;
@@ -24,9 +25,21 @@ public class Picture {
     }
 
     public void imageToFile(String image) {
-        readPictureFromImage(image);
-        String rgbNumberFileName = image.split("\\.")[0] + "RGB.txt";
-        savePictureToFile(rgbNumberFileName);
+        boolean isExtensionSpecified = image.split("\\.").length > 1; // Указано ли расширение
+        if (isExtensionSpecified) {
+            readPictureFromImage(image);
+            String rgbNumberFileName = image.split("\\.")[0] + "RGB.txt";
+            savePictureToFile(rgbNumberFileName);
+        } else {
+            if (new File(image + ".png").exists()) {
+                readPictureFromImage(image + ".png");
+            }
+            else if (new File(image + ".jpg").exists()) {
+                readPictureFromImage(image + ".jpg");
+            }
+            String rgbNumberFileName = image + "RGB.txt";
+            savePictureToFile(rgbNumberFileName);
+        }
     }
 
     public void readPictureFromImage(String path) {
@@ -98,10 +111,30 @@ public class Picture {
     }
 
     public void savePictureIndexToFile(String path) {
+        if (path.split("\\.").length == 1) {
+            path = path + "Index.txt";
+        }
 
+        long timer = System.currentTimeMillis();
+        indexNumber = new BigInteger(rgbNumber, 16);
+        try (FileWriter file = new FileWriter(path)) {
+            file.write(pictureWidth + " " + pictureHeight + "\n");
+            file.write(indexNumber.toString());
+        } catch (IOException e) {
+            System.out.println("Не удалось записать IndexNumber в файл " + path);
+        }
+        System.out.println(System.currentTimeMillis() - timer);
     }
 
     public void loadPictureFromIndexFile(String path) {
+
+    }
+
+    private void loadPictureFromIndexNumber() {
+
+    }
+
+    private void loadIndexNumber(String path) {
 
     }
 
